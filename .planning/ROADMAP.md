@@ -43,8 +43,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Build Student Dashboard and Essay Writer UI with word counter.
-- [ ] 02-02: Implement essay auto-save and submission pipeline with validation.
+- [x] 02-01: Build Student Dashboard and Essay Writer UI with word counter. (completed 2026-06-09)
+- [x] 02-02: Implement essay auto-save and submission pipeline with validation. (completed 2026-06-09)
 
 ### Phase 3: Background AI Evaluation Service
 **Goal**: Build an asynchronous processor queue to evaluate submissions using Gemini API server-side.
@@ -80,6 +80,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Authentication | 1/1 | Complete    | 2026-06-09 |
-| 2. Student Examination Flow | 0/2 | Planned     | - |
+| 2. Student Examination Flow | 2/2 | Complete    | 2026-06-09 |
 | 3. Background AI Evaluation Service | 0/1 | Not started | - |
 | 4. Admin Dashboard & Actions | 0/1 | Not started | - |
