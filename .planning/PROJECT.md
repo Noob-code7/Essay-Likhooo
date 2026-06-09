@@ -12,12 +12,10 @@ Ensure 100% reliable submission and storage of student essays immediately upon s
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ **AUTH-01**: Student login using Student ID and Password. — Validated in Phase 1
+- ✓ **AUTH-02**: Admin login using Username and Password. — Validated in Phase 1
 
 ### Active
-
-- [ ] **AUTH-01**: Student login using Student ID and Password.
-- [ ] **AUTH-02**: Admin login using Username and Password.
 - [ ] **EXAM-01**: Student dashboard showing student details, assigned exam topic, and "Start Writing" button.
 - [ ] **EXAM-02**: Essay writing page with topic, large text area, word/character count, and auto-save status.
 - [ ] **EXAM-03**: Auto-save essay draft every 30 seconds to the database with a subtle status indicator.

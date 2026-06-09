@@ -7,8 +7,8 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: Student login using Student ID and Password.
-- [ ] **AUTH-02**: Admin login using Username and Password.
+- [x] **AUTH-01**: Student login using Student ID and Password.
+- [x] **AUTH-02**: Admin login using Username and Password.
 
 ### Student Examination Flow
 
@@ -54,8 +54,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
 | EXAM-01 | Phase 2 | Pending |
 | EXAM-02 | Phase 2 | Pending |
 | EXAM-03 | Phase 2 | Pending |
