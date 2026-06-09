@@ -28,6 +28,20 @@ export default async function StudentDashboardPage() {
     .limit(1)
     .single();
 
+  if (exam) {
+    // If student has already submitted, redirect to success page
+    const { data: submission } = await supabase
+      .from('submissions')
+      .select('status')
+      .eq('student_id', payload.id)
+      .eq('exam_id', exam.id)
+      .single();
+
+    if (submission && submission.status !== 'draft') {
+      redirect('/submit-success');
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation Header */}

@@ -45,12 +45,16 @@ class MockQueryBuilder {
   private tableName: string;
   private filters: { col: string; val: any }[] = [];
   private limitCount?: number;
+  private operation: 'select' | 'insert' | 'update' | 'delete' = 'select';
+  private updateValues: any = null;
+  private insertRows: any = null;
 
   constructor(tableName: string) {
     this.tableName = tableName;
   }
 
   select(columns: string = '*') {
+    this.operation = 'select';
     return this;
   }
 
@@ -65,74 +69,87 @@ class MockQueryBuilder {
   }
 
   async single() {
-    const data = loadMockData();
-    const list = data[this.tableName] || [];
-    const filtered = list.filter((item: any) => {
-      return this.filters.every(f => String(item[f.col]) === String(f.val));
-    });
-
-    if (filtered.length === 0) {
+    const res = await this.execute();
+    const list = res.data || [];
+    if (list.length === 0) {
       return { data: null, error: { message: 'Row not found', code: 'PGRST116' } };
     }
-    return { data: filtered[0], error: null };
+    return { data: list[0], error: null };
   }
 
-  async insert(rows: any | any[]) {
-    const data = loadMockData();
-    if (!data[this.tableName]) data[this.tableName] = [];
-    
-    const newRows = Array.isArray(rows) ? rows : [rows];
-    const createdRows = newRows.map((row: any) => ({
-      id: row.id || crypto.randomUUID(),
-      created_at: new Date().toISOString(),
-      ...row
-    }));
-
-    data[this.tableName].push(...createdRows);
-    saveMockData(data);
-
-    return { data: Array.isArray(rows) ? createdRows : createdRows[0], error: null };
+  insert(rows: any | any[]) {
+    this.operation = 'insert';
+    this.insertRows = rows;
+    return this;
   }
 
-  async update(values: any) {
-    const data = loadMockData();
-    const list = data[this.tableName] || [];
-    
-    let updatedCount = 0;
-    const updatedList = list.map((item: any) => {
-      const match = this.filters.every(f => String(item[f.col]) === String(f.val));
-      if (match) {
-        updatedCount++;
-        return { ...item, ...values, updated_at: new Date().toISOString() };
-      }
-      return item;
-    });
-
-    data[this.tableName] = updatedList;
-    saveMockData(data);
-
-    return { data: values, error: null, count: updatedCount };
+  update(values: any) {
+    this.operation = 'update';
+    this.updateValues = values;
+    return this;
   }
 
-  async delete() {
+  delete() {
+    this.operation = 'delete';
+    return this;
+  }
+
+  private async execute() {
     const data = loadMockData();
     const list = data[this.tableName] || [];
-    const remaining = list.filter((item: any) => {
-      return !this.filters.every(f => String(item[f.col]) === String(f.val));
-    });
-    data[this.tableName] = remaining;
-    saveMockData(data);
-    return { error: null };
+
+    if (this.operation === 'select') {
+      const filtered = list.filter((item: any) => {
+        return this.filters.every(f => String(item[f.col]) === String(f.val));
+      });
+      const limited = this.limitCount !== undefined ? filtered.slice(0, this.limitCount) : filtered;
+      return { data: limited, error: null };
+    }
+
+    if (this.operation === 'insert') {
+      if (!data[this.tableName]) data[this.tableName] = [];
+      const newRows = Array.isArray(this.insertRows) ? this.insertRows : [this.insertRows];
+      const createdRows = newRows.map((row: any) => ({
+        id: row.id || crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        ...row
+      }));
+      data[this.tableName].push(...createdRows);
+      saveMockData(data);
+      return { data: Array.isArray(this.insertRows) ? createdRows : createdRows[0], error: null };
+    }
+
+    if (this.operation === 'update') {
+      let updatedCount = 0;
+      let updatedData: any = null;
+      const updatedList = list.map((item: any) => {
+        const match = this.filters.every(f => String(item[f.col]) === String(f.val));
+        if (match) {
+          updatedCount++;
+          updatedData = { ...item, ...this.updateValues, updated_at: new Date().toISOString() };
+          return updatedData;
+        }
+        return item;
+      });
+      data[this.tableName] = updatedList;
+      saveMockData(data);
+      return { data: updatedData, error: null, count: updatedCount };
+    }
+
+    if (this.operation === 'delete') {
+      const remaining = list.filter((item: any) => {
+        return !this.filters.every(f => String(item[f.col]) === String(f.val));
+      });
+      data[this.tableName] = remaining;
+      saveMockData(data);
+      return { data: null, error: null };
+    }
+
+    return { data: [], error: null };
   }
 
-  // Promise-like then to return mock list directly for await
   then(onfulfilled?: (value: any) => any, onrejected?: (reason: any) => any) {
-    const data = loadMockData();
-    const list = data[this.tableName] || [];
-    const filtered = list.filter((item: any) => {
-      return this.filters.every(f => String(item[f.col]) === String(f.val));
-    });
-    return Promise.resolve({ data: filtered, error: null }).then(onfulfilled, onrejected);
+    return this.execute().then(onfulfilled, onrejected);
   }
 }
 
