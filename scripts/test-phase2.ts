@@ -9,17 +9,17 @@ async function runTests() {
   console.log('--- STARTING PHASE 2 AUTOMATED TESTS ---');
 
   try {
-    // 1. Fetch STU001 student
+    // 1. Fetch IT2024001 student
     const { data: student, error: studentError } = await supabase
       .from('students')
       .select('*')
-      .eq('student_id', 'STU001')
+      .eq('student_id', 'IT2024001')
       .single();
 
     if (studentError || !student) {
-      throw new Error('Could not fetch test student STU001: ' + (studentError?.message || 'not found'));
+      throw new Error('Could not fetch test student IT2024001: ' + (studentError?.message || 'not found'));
     }
-    console.log(`✓ Fetched student STU001 (id: ${student.id})`);
+    console.log(`✓ Fetched student IT2024001 (id: ${student.id})`);
 
     // 2. Fetch active exam
     const { data: exam, error: examError } = await supabase
@@ -34,7 +34,7 @@ async function runTests() {
     console.log(`✓ Fetched active exam (id: ${exam.id})`);
 
     // 3. Clean up any existing submissions for this student and exam
-    console.log('Cleaning up existing submissions for STU001...');
+    console.log('Cleaning up existing submissions for IT2024001...');
     await supabase
       .from('submissions')
       .delete()

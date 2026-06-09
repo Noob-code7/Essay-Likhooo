@@ -2,7 +2,20 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyJWT } from '@/lib/auth-helpers';
 import { supabase } from '@/lib/db';
-import { BookOpen, User, LogOut, CheckCircle2, Calendar, FileText, ArrowRight, Loader2 } from 'lucide-react';
+import { 
+  BookOpen, 
+  User, 
+  LogOut, 
+  CheckCircle2, 
+  Calendar, 
+  FileText, 
+  ArrowRight, 
+  Loader2, 
+  AlertCircle, 
+  Award, 
+  Sparkles 
+} from 'lucide-react';
+import RefreshButton from './refresh-button';
 
 export default async function SubmitSuccessPage() {
   const cookieStore = await cookies();
@@ -45,12 +58,107 @@ export default async function SubmitSuccessPage() {
     redirect('/');
   }
 
+  // Fetch AI scores if completed
+  let aiScore = null;
+  if (submission.status === 'completed') {
+    const { data } = await supabase
+      .from('ai_scores')
+      .select('*')
+      .eq('submission_id', submission.id)
+      .single();
+    aiScore = data;
+  }
+
   const formattedDate = submission.submitted_at 
     ? new Date(submission.submitted_at).toLocaleString('en-US', {
         dateStyle: 'medium',
         timeStyle: 'short',
       })
     : 'N/A';
+
+  // Determine header icon, title, and description based on status
+  const getHeaderDetails = () => {
+    switch (submission.status) {
+      case 'completed':
+        return {
+          icon: (
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 border border-blue-100 text-blue-600">
+              <Award className="h-10 w-10" />
+            </div>
+          ),
+          title: 'Evaluation Completed',
+          description: 'Your essay has been evaluated. Below are your grades and constructive feedback.'
+        };
+      case 'failed':
+        return {
+          icon: (
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-50 border border-green-100 text-green-600">
+              <CheckCircle2 className="h-10 w-10" />
+            </div>
+          ),
+          title: 'Thank You for Participating!',
+          description: 'Your essay has been received and saved successfully. Results will be declared by the administrator after evaluation.'
+        };
+      case 'evaluating':
+        return {
+          icon: (
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-yellow-50 border border-yellow-100 text-yellow-600">
+              <Loader2 className="h-10 w-10 animate-spin text-yellow-500" />
+            </div>
+          ),
+          title: 'Evaluating Essay...',
+          description: 'Your essay is currently being graded by the AI. This should only take a few seconds.'
+        };
+      case 'pending':
+      default:
+        return {
+          icon: (
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-50 border border-green-100 text-green-600">
+              <CheckCircle2 className="h-10 w-10" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-10"></span>
+            </div>
+          ),
+          title: 'Submission Successful',
+          description: 'Your essay has been successfully recorded in our secure database. An automated evaluation is running in the background.'
+        };
+    }
+  };
+
+  const headerDetails = getHeaderDetails();
+
+  const getStatusBadge = () => {
+    switch (submission.status) {
+      case 'completed':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3.5 py-1.5 text-xs font-bold text-green-700 border border-green-100/50 shadow-xs">
+            <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+            Evaluated
+          </span>
+        );
+      case 'failed':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3.5 py-1.5 text-xs font-bold text-red-700 border border-red-100/50 shadow-xs">
+            <AlertCircle className="h-3.5 w-3.5 text-red-600" />
+            Failed
+          </span>
+        );
+      case 'evaluating':
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3.5 py-1.5 text-xs font-bold text-yellow-700 border border-yellow-100/50 shadow-xs">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-yellow-600" />
+            Evaluating...
+          </span>
+        );
+      case 'pending':
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-700 border border-blue-100/50 shadow-xs">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
+            Queued
+          </span>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -88,20 +196,17 @@ export default async function SubmitSuccessPage() {
       {/* Main Content */}
       <main className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-slate-100 bg-white p-8 md:p-12 shadow-sm text-center space-y-8">
-          {/* Animated Success Icon */}
+          {/* Status Icon */}
           <div className="flex justify-center">
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-50 border border-green-100 text-green-600">
-              <CheckCircle2 className="h-10 w-10" />
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-10"></span>
-            </div>
+            {headerDetails.icon}
           </div>
 
           <div className="space-y-3">
             <h1 className="text-3xl font-extrabold text-slate-900 font-heading">
-              Submission Successful
+              {headerDetails.title}
             </h1>
             <p className="max-w-md mx-auto text-sm text-slate-500 leading-relaxed">
-              Your essay has been successfully recorded in our secure database. An automated evaluation is being run in the background.
+              {headerDetails.description}
             </p>
           </div>
 
@@ -131,31 +236,92 @@ export default async function SubmitSuccessPage() {
 
             <div className="border-t border-slate-200/60 pt-4 flex items-center justify-between">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Evaluation Status</span>
-              
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-700 border border-blue-100/50 shadow-xs">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
-                Pending Evaluation
-              </span>
+              <div className="flex items-center gap-3">
+                {getStatusBadge()}
+                <RefreshButton status={submission.status} />
+              </div>
             </div>
           </div>
 
-          {/* Info banner */}
-          <div className="rounded-2xl border border-dashed border-slate-200 p-5 text-left bg-slate-50/50">
-            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">What happens next?</h3>
-            <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-              The Google Gemini API model is analyzing your essay for grammar correctness, accuracy & relevance to the prompt topic, and writing quality. You do not need to keep this page open. You can check back on your student dashboard for feedback and score results once they are ready.
-            </p>
-          </div>
+          {/* Dynamic Scoring Breakdown */}
+          {submission.status === 'completed' && aiScore ? (
+            <div className="space-y-6">
+              {/* Overall Grade Card */}
+              <div className="bg-linear-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-md space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-100">Overall Grade</span>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-5xl font-black font-heading">{aiScore.overall_score}</span>
+                  <span className="text-lg text-blue-200">/ 100</span>
+                </div>
+                <p className="text-[10px] text-blue-200">Graded by {aiScore.model_version}</p>
+              </div>
+
+              {/* Score breakdown category columns */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center space-y-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Grammar</span>
+                  <span className="text-base font-extrabold text-slate-800">{aiScore.grammar_score}</span>
+                  <span className="text-[10px] text-slate-400 block">/ 30</span>
+                </div>
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center space-y-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Accuracy</span>
+                  <span className="text-base font-extrabold text-slate-800">{aiScore.accuracy_score}</span>
+                  <span className="text-[10px] text-slate-400 block">/ 30</span>
+                </div>
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-center space-y-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Quality</span>
+                  <span className="text-base font-extrabold text-slate-800">{aiScore.quality_score}</span>
+                  <span className="text-[10px] text-slate-400 block">/ 30</span>
+                </div>
+              </div>
+
+              {/* Constructive feedback block */}
+              <div className="text-left space-y-2 border-t border-slate-100 pt-6">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  <Sparkles className="h-4 w-4 text-blue-500 fill-current" />
+                  <span>AI Evaluation Feedback</span>
+                </div>
+                <div className="bg-blue-50/10 border border-blue-100/50 p-5 rounded-xl text-sm text-slate-700 leading-relaxed font-sans whitespace-pre-wrap">
+                  {aiScore.feedback}
+                </div>
+              </div>
+            </div>
+          ) : submission.status === 'failed' ? (
+            <div className="rounded-2xl bg-green-50 p-6 border border-green-100 text-center space-y-3">
+              <div className="flex justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
+                  <CheckCircle2 className="h-6 w-6" />
+                </div>
+              </div>
+              <h4 className="font-bold text-green-900 text-base">Your submission has been recorded!</h4>
+              <p className="text-sm text-green-700 leading-relaxed max-w-sm mx-auto">
+                Thank you for taking the test. Your results will be reviewed and declared by the administrator once the evaluation is complete.
+              </p>
+              <p className="text-xs text-green-600 font-medium">
+                No further action is needed from your end.
+              </p>
+            </div>
+          ) : (
+            /* Pending banner */
+            <div className="rounded-2xl border border-dashed border-slate-200 p-5 text-left bg-slate-50/50">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">What happens next?</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                The Google Gemini API model is analyzing your essay for grammar correctness, accuracy & relevance to the prompt topic, and writing quality. You do not need to keep this page open. You can check back on your student dashboard for feedback and score results once they are ready.
+              </p>
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="flex justify-center border-t border-slate-100 pt-6">
-            <a
-              href="/"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
-            >
-              Back to Dashboard
-              <ArrowRight className="h-4 w-4" />
-            </a>
+            <form action="/api/auth/logout" method="POST">
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+              >
+                Back to Login
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
           </div>
         </div>
       </main>

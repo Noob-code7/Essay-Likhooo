@@ -12,17 +12,17 @@ async function runTest() {
   let workerProcess: any = null;
 
   try {
-    // 1. Fetch STU001 student
+    // 1. Fetch IT2024001 student
     const { data: student, error: studentError } = await supabase
       .from('students')
       .select('*')
-      .eq('student_id', 'STU001')
+      .eq('student_id', 'IT2024001')
       .single();
 
     if (studentError || !student) {
-      throw new Error('Could not fetch test student STU001: ' + (studentError?.message || 'not found'));
+      throw new Error('Could not fetch test student IT2024001: ' + (studentError?.message || 'not found'));
     }
-    console.log(`✓ Fetched student STU001 (id: ${student.id})`);
+    console.log(`✓ Fetched student IT2024001 (id: ${student.id})`);
 
     // 2. Fetch active exam
     const { data: exam, error: examError } = await supabase
@@ -37,7 +37,7 @@ async function runTest() {
     console.log(`✓ Fetched active exam (id: ${exam.id})`);
 
     // 3. Clean up any existing submissions and scores for this student and exam
-    console.log('Cleaning up existing submissions and scores for STU001...');
+    console.log('Cleaning up existing submissions and scores for IT2024001...');
     
     // Fetch old submission if exists to delete scores
     const { data: oldSub } = await supabase
@@ -53,7 +53,7 @@ async function runTest() {
     await supabase.from('submissions').delete().eq('student_id', student.id).eq('exam_id', exam.id);
 
     // 4. Insert a new pending submission
-    console.log('\nInserting new pending submission for STU001...');
+    console.log('\nInserting new pending submission for IT2024001...');
     const testEssayText = Array(10).fill('The role of AI in classrooms presents several pros and cons for students and educators. While it can help automate grading and explain complex ideas, it might reduce student writing critical analysis skills. Overall, classrooms must learn how to integrate it responsibly.').join(' ');
     const wordCount = countWords(testEssayText);
 
@@ -65,7 +65,9 @@ async function runTest() {
         essay_text: testEssayText,
         word_count: wordCount,
         status: 'pending'
-      });
+      })
+      .select()
+      .single();
 
     if (insertError || !submission) {
       throw new Error('Failed to insert pending submission: ' + insertError?.message);
@@ -88,9 +90,9 @@ async function runTest() {
     });
 
     // 6. Poll database until submission is completed
-    console.log('\nPolling database to wait for status to transition to "completed" (max 15 seconds)...');
+    console.log('\nPolling database to wait for status to transition to "completed" (max 50 seconds)...');
     
-    const maxPollAttempts = 8;
+    const maxPollAttempts = 25;
     let attempt = 0;
     let isCompleted = false;
     let finalSubmissionState: any = null;

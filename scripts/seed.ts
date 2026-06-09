@@ -9,9 +9,9 @@ async function seed() {
 
     // Seed Students
     const testStudents = [
-      { student_id: 'STU001', name: 'John Doe', password_hash: passwordHash },
-      { student_id: 'STU002', name: 'Jane Smith', password_hash: passwordHash },
-      { student_id: 'STU003', name: 'Alex Johnson', password_hash: passwordHash }
+      { student_id: 'IT2024001', name: 'John Doe', password_hash: passwordHash },
+      { student_id: 'CSE2023002', name: 'Jane Smith', password_hash: passwordHash },
+      { student_id: 'ECE2022003', name: 'Alex Johnson', password_hash: passwordHash }
     ];
 
     console.log('Seeding students...');
@@ -35,8 +35,8 @@ async function seed() {
     // Seed Exams
     console.log('Seeding exams...');
     const examData = {
-      title: 'English Composition Final Exam',
-      topic: 'The Impact of Artificial Intelligence on Modern Education. Discuss the pros and cons of AI in classrooms, and how it shapes the future of learning.',
+      title: 'Essay Writing',
+      topic: 'How would you like to describe yourself?',
       start_time: new Date().toISOString(),
       end_time: new Date(Date.now() + 60 * 60 * 24 * 1000).toISOString() // 24 hours from now
     };

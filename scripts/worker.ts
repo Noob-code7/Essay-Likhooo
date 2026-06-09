@@ -40,7 +40,7 @@ async function evaluateEssay(essayText: string, examTopic: string) {
   }
 
   const genAI = new GoogleGenerativeAI(geminiApiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `
     You are an expert academic examiner grading a student's essay exam.
@@ -154,7 +154,7 @@ async function processNextPendingSubmission() {
         quality_score: Number(evaluation.qualityScore),
         overall_score: Number(evaluation.overallScore),
         feedback: String(evaluation.feedback),
-        model_version: isMockAi ? 'mock-evaluator-v1' : 'gemini-1.5-flash'
+        model_version: isMockAi ? 'mock-evaluator-v1' : 'gemini-2.5-flash'
       });
 
     if (insertScoreError) {
@@ -180,8 +180,11 @@ async function processNextPendingSubmission() {
 
     if (currentRetries < 3) {
       const nextRetries = currentRetries + 1;
-      console.log(`Retrying submission ${submission.id}. Attempt: ${nextRetries}/3`);
+      const delaySec = nextRetries * 5; // 5s, 10s, 15s delay
+      console.log(`Waiting ${delaySec} seconds before retrying submission ${submission.id}. Attempt: ${nextRetries}/3`);
       
+      await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
+
       // Roll status back to pending, incrementing retry count
       await supabase
         .from('submissions')

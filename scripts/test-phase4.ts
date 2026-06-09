@@ -40,13 +40,19 @@ async function runTests() {
     }
 
     // Insert submission
-    const { data: submission } = await supabase.from('submissions').insert({
+    const { data: submission, error: insertError } = await supabase.from('submissions').insert({
       student_id: student.id,
       exam_id: exam.id,
       essay_text: 'This is a test essay to verify admin manual triggers.',
       word_count: 10,
       status: 'completed'
-    });
+    })
+    .select()
+    .single();
+
+    if (insertError || !submission) {
+      throw new Error('Failed to insert mock submission: ' + insertError?.message);
+    }
 
     // Insert score
     await supabase.from('ai_scores').insert({
