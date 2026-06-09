@@ -70,7 +70,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: Build Admin Dashboard UI, CSV export features, and download/manual evaluation actions.
+- [x] 04-01: Build Admin Dashboard UI, CSV export features, and download/manual evaluation actions. (completed 2026-06-09)
 
 ## Progress
 
@@ -82,4 +82,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation & Authentication | 1/1 | Complete    | 2026-06-09 |
 | 2. Student Examination Flow | 2/2 | Complete    | 2026-06-09 |
 | 3. Background AI Evaluation Service | 1/1 | Complete    | 2026-06-09 |
-| 4. Admin Dashboard & Actions | 0/1 | Planned     | - |
+| 4. Admin Dashboard & Actions | 1/1 | Complete    | 2026-06-09 |
