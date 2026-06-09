@@ -57,7 +57,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 03-01: Implement background worker job, Gemini API connection, retry logic, and JSON score parsing.
+- [x] 03-01: Implement background worker job, Gemini API connection, retry logic, and JSON score parsing. (completed 2026-06-09)
 
 ### Phase 4: Admin Dashboard & Actions
 **Goal**: Build administrative dashboards to monitor results, view essays, manually retry failed evaluations, and export CSV/essay data.
@@ -81,5 +81,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Authentication | 1/1 | Complete    | 2026-06-09 |
 | 2. Student Examination Flow | 2/2 | Complete    | 2026-06-09 |
-| 3. Background AI Evaluation Service | 0/1 | Planned     | - |
+| 3. Background AI Evaluation Service | 1/1 | Complete    | 2026-06-09 |
 | 4. Admin Dashboard & Actions | 0/1 | Not started | - |
