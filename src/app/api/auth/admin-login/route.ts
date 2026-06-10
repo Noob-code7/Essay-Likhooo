@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { comparePassword, signJWT } from '@/lib/auth-helpers';
 
-const DEFAULT_ADMIN_HASH = '$2a$10$w4rU8qB5wE2sQG9bEefHze0tqZ2g8Bw.x2Kj5Mh2o4Z0X3T9xZ.9y'; // bcrypt hash for 'admin123'
+const DEFAULT_ADMIN_HASH = '$2b$10$ONGId/ojMwdeS4sj5mGog.zwRFXLEJ8dvGxII7qqn/aUmDSevI6xu'; // bcrypt hash for 'admin123'
 
 export async function POST(req: NextRequest) {
   try {
