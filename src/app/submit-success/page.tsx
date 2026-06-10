@@ -137,9 +137,9 @@ export default async function SubmitSuccessPage() {
         );
       case 'failed':
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3.5 py-1.5 text-xs font-bold text-red-700 border border-red-100/50 shadow-xs">
-            <AlertCircle className="h-3.5 w-3.5 text-red-600" />
-            Failed
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-700 border border-blue-100/50 shadow-xs">
+            <CheckCircle2 className="h-3.5 w-3.5 text-blue-600" />
+            Submitted
           </span>
         );
       case 'evaluating':
@@ -301,15 +301,7 @@ export default async function SubmitSuccessPage() {
                 No further action is needed from your end.
               </p>
             </div>
-          ) : (
-            /* Pending banner */
-            <div className="rounded-2xl border border-dashed border-slate-200 p-5 text-left bg-slate-50/50">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">What happens next?</h3>
-              <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                The Google Gemini API model is analyzing your essay for grammar correctness, accuracy & relevance to the prompt topic, and writing quality. You do not need to keep this page open. You can check back on your student dashboard for feedback and score results once they are ready.
-              </p>
-            </div>
-          )}
+          ) : null}
 
           {/* Action buttons */}
           <div className="flex justify-center border-t border-slate-100 pt-6">
