@@ -113,11 +113,33 @@ class MockQueryBuilder {
     if (this.operation === 'insert') {
       if (!data[this.tableName]) data[this.tableName] = [];
       const newRows = Array.isArray(this.insertRows) ? this.insertRows : [this.insertRows];
-      const createdRows = newRows.map((row: any) => ({
-        id: row.id || crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-        ...row
-      }));
+      const createdRows = newRows.map((row: any) => {
+        const item = {
+          id: row.id || crypto.randomUUID(),
+          created_at: new Date().toISOString(),
+          ...row
+        };
+
+        // Trigger logic for submissions
+        if (this.tableName === 'submissions') {
+          const student = data.students?.find((s: any) => String(s.id) === String(item.student_id));
+          if (student) {
+            item.roll_number = student.student_id;
+            item.student_name = student.name;
+          }
+        }
+
+        // Trigger logic for ai_scores
+        if (this.tableName === 'ai_scores') {
+          const sub = data.submissions?.find((s: any) => String(s.id) === String(item.submission_id));
+          if (sub) {
+            item.roll_number = sub.roll_number;
+            item.student_name = sub.student_name;
+          }
+        }
+
+        return item;
+      });
       data[this.tableName].push(...createdRows);
       saveMockData(data);
       return { data: Array.isArray(this.insertRows) ? createdRows : createdRows[0], error: null };
@@ -130,6 +152,50 @@ class MockQueryBuilder {
         const match = this.filters.every(f => String(item[f.col]) === String(f.val));
         if (match) {
           updatedCount++;
+          // Trigger logic when updating student's name
+          if (this.tableName === 'students' && this.updateValues.name && item.name !== this.updateValues.name) {
+            const newName = this.updateValues.name;
+            // Update submissions
+            if (data.submissions) {
+              data.submissions = data.submissions.map((sub: any) => {
+                if (String(sub.student_id) === String(item.id)) {
+                  return { ...sub, student_name: newName };
+                }
+                return sub;
+              });
+            }
+            // Update ai_scores
+            if (data.ai_scores) {
+              data.ai_scores = data.ai_scores.map((score: any) => {
+                const sub = data.submissions?.find((s: any) => String(s.id) === String(score.submission_id));
+                if (sub && String(sub.student_id) === String(item.id)) {
+                  return { ...score, student_name: newName };
+                }
+                return score;
+              });
+            }
+          }
+
+          // Trigger logic for submissions updates (e.g. changing student_id or other fields)
+          if (this.tableName === 'submissions') {
+            const currentStudentId = this.updateValues.student_id || item.student_id;
+            const student = data.students?.find((s: any) => String(s.id) === String(currentStudentId));
+            if (student) {
+              item.roll_number = student.student_id;
+              item.student_name = student.name;
+            }
+          }
+
+          // Trigger logic for ai_scores updates (e.g. changing submission_id)
+          if (this.tableName === 'ai_scores') {
+            const currentSubId = this.updateValues.submission_id || item.submission_id;
+            const sub = data.submissions?.find((s: any) => String(s.id) === String(currentSubId));
+            if (sub) {
+              item.roll_number = sub.roll_number;
+              item.student_name = sub.student_name;
+            }
+          }
+
           updatedData = { ...item, ...this.updateValues, updated_at: new Date().toISOString() };
           return updatedData;
         }

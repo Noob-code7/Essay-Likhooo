@@ -76,7 +76,9 @@ export async function POST(req: NextRequest) {
       extraId: student.student_id
     });
 
-    const response = NextResponse.json({ success: true, name: student.name });
+    // Detect if student still has the default auto-generated name and needs to set their real name
+    const needsSetup = student.name.startsWith(`Student ${normalizedStudentId}`);
+    const response = NextResponse.json({ success: true, name: student.name, needsSetup });
 
     // Set cookie
     response.cookies.set({

@@ -28,6 +28,8 @@ export default function StudentLoginPage() {
 
       if (!res.ok) {
         setError(data.error || 'Invalid credentials. Please verify your ID and password and try again.');
+      } else if (data.needsSetup) {
+        router.push('/setup');
       } else {
         router.push('/');
       }

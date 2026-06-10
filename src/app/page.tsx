@@ -21,6 +21,11 @@ export default async function StudentDashboardPage() {
     redirect('/admin');
   }
 
+  // If student hasn't set their real name yet, send them to the setup page
+  if (payload.name && payload.name.startsWith(`Student ${payload.extraId}`)) {
+    redirect('/setup');
+  }
+
   // Fetch active exam from database
   const { data: exam } = await supabase
     .from('exams')
