@@ -228,5 +228,16 @@ async function startWorker() {
   }
 }
 
+import http from 'http';
+
+// Create a dummy HTTP server to bind to $PORT for Render Free Web Service compatibility
+const port = process.env.PORT || 3001;
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('AI Worker is active and polling.\n');
+}).listen(port, () => {
+  console.log(`Port binding listener started on port ${port} for Render Web Service compatibility.`);
+});
+
 // Execute worker
 startWorker();
