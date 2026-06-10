@@ -115,11 +115,10 @@ export default async function SubmitSuccessPage() {
           icon: (
             <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-green-50 border border-green-100 text-green-600">
               <CheckCircle2 className="h-10 w-10" />
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-10"></span>
             </div>
           ),
-          title: 'Submission Successful',
-          description: 'Your essay has been successfully recorded in our secure database. An automated evaluation is running in the background.'
+          title: 'Thank You for Participating!',
+          description: 'Your essay has been received and saved successfully. Results will be declared by the administrator after evaluation.'
         };
     }
   };
@@ -152,9 +151,9 @@ export default async function SubmitSuccessPage() {
       case 'pending':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-bold text-blue-700 border border-blue-100/50 shadow-xs">
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
-            Queued
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3.5 py-1.5 text-xs font-bold text-green-700 border border-green-100/50 shadow-xs">
+            <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+            Submitted
           </span>
         );
     }
@@ -238,7 +237,6 @@ export default async function SubmitSuccessPage() {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Evaluation Status</span>
               <div className="flex items-center gap-3">
                 {getStatusBadge()}
-                <RefreshButton status={submission.status} />
               </div>
             </div>
           </div>
